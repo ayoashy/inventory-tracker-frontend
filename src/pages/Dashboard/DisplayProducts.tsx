@@ -4,12 +4,13 @@ import CardThree from '../../components/CardThree';
 import CardTwo from '../../components/CardTwo';
 import { useDeleteProductApi, useGetProductApi, useGetUserProductApi } from '../../data/hooks/product';
 import { useGetUserApi } from '../../data/hooks/auth';
-import { message } from 'antd';
+import {  message } from 'antd';
 import { useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { FiShoppingCart } from 'react-icons/fi';
 import ProductCard from '../../components/ProductCard';
+import Breadcrumb from '../../components/Breadcrumb';
 
 
 type ProductType = {
@@ -79,20 +80,13 @@ const DisplayProduct = () => {
 
   return (
     <div className="space-y-10">
+      <Breadcrumb pageName="Products" />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         {/* <CardTwo sales={data?.processProduct.totalSales} /> */}
-        <CardTwo
-          sales={
-              data?.processProduct.totalSales
-          }
-        />
-        <CardThree
-          product={
-               data?.processProduct.totalProduct
-          }
-        />
+        <CardTwo sales={data?.processProduct.totalSales} />
+        <CardThree product={data?.processProduct.totalProduct} />
         {/* <CardThree product={data?.processProduct.totalProduct} /> */}
-       {isAdmin && <CardFour user={data?.processProduct.totalUser} />}
+        {isAdmin && <CardFour user={data?.processProduct.totalUser} />}
       </div>
       {emptyState && (
         <div className="flex flex-col items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">

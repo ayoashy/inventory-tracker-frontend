@@ -9,7 +9,6 @@ const SelectApp = () => {
   console.log('shouting from select app');
   
   const data = useAuth();
-  // if (!data) return <UnauthenticatedApp />;
 
   let app;
 
@@ -22,11 +21,6 @@ const SelectApp = () => {
 
   console.log(app);
   
-  // if (data?.user.type === 'admin') {
-  //   app = <AdminApp />;
-  // } else if (data?.user.type === 'sales') {
-  //   return <h1 className="">this is sales app</h1>;
-  // }
 
   return (
     <AuthDataContext.Provider value={data}>{app}</AuthDataContext.Provider>

@@ -8,6 +8,7 @@ import { useAuth } from '../../context/AuthContext.tsx';
 
 import { useGetProductApi, useGetUserProductApi } from '../../data/hooks/product.ts';
 import { message } from 'antd';
+import Breadcrumb from '../../components/Breadcrumb.tsx';
 // import { useEffect } from 'react';
 
 const ECommerce = () => {
@@ -29,24 +30,25 @@ const ECommerce = () => {
    // Handle Admin Product Error (error from useGetProductApi)
    if (error && !hasShownAdminError.current) {
      message.error(
-       error.message || 'An error occurred while fetching admin products',
+       error?.message || 'An error occurred while fetching admin products',
      );
      hasShownAdminError.current = true; // Mark the admin error as shown
    }
 
    // Handle User Product Error (error from useGetUserProductApi)
-   if (userProductData && !hasShownUserError.current) {
+   if (userProductError && !hasShownUserError.current) {
      message.error(
-       userProductData.message ||
+       userProductError?.message ||
          'An error occurred while fetching user products',
      );
      hasShownUserError.current = true; // Mark the user error as shown
    }
- }, [error, userProductData]);
+ }, [error, userProductData, hasShownAdminError.current, hasShownUserError.current]);
   
   
   return (
     <>
+      <Breadcrumb pageName="Home" />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
         <CardTwo
           sales={
