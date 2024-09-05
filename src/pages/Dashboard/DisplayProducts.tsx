@@ -1,4 +1,3 @@
-import { FaBox, FaDollarSign, FaCubes, FaCalculator, FaEdit, FaTrash } from 'react-icons/fa';
 import Loader from '../../common/Loader';
 import CardFour from '../../components/CardFour';
 import CardThree from '../../components/CardThree';
@@ -6,7 +5,7 @@ import CardTwo from '../../components/CardTwo';
 import { useDeleteProductApi, useGetProductApi, useGetUserProductApi } from '../../data/hooks/product';
 import { useGetUserApi } from '../../data/hooks/auth';
 import { message } from 'antd';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { FiShoppingCart } from 'react-icons/fi';
@@ -31,28 +30,48 @@ type DisplayProductType = {
 };
 
 const DisplayProduct = () => {
-  const { data, isLoading, error } = useGetProductApi();
+  console.log('display renders');
+  
+  const { data: AdminProductData, isLoading, error } = useGetProductApi();
   const {
     data: userProductData,
     isLoading: userProductLoading,
     error: userProductError,
   } = useGetUserProductApi();
-  console.log({ userProductData });
-  
+
   const userData = useAuth();
 
   const isAdmin = userData?.user?.type === 'admin';
-  console.log({ userProductData });
+
+  let data;
+  if(isAdmin){
+    data = AdminProductData
+  }else{
+    data = userProductData
+  }
+
+  const emptyState =
+    (userData?.user.type === 'sales' && userProductData?.products.length < 1) ||
+    (userData?.user.type === 'admin' && AdminProductData?.products.length < 1);
   
+ const hasShownAdminError = useRef(false);
+ const hasShownUserError = useRef(false);
 
-  const emptyState =  (userData?.user.type === 'sales' && userProductData?.products.length < 1)
+ useEffect(() => {
+   // Handle Admin Product Error (error from useGetProductApi)
+   if (error && !hasShownAdminError.current) {
+     message.error(error.message||'An error occurred while fetching admin products');
+     hasShownAdminError.current = true; // Mark the admin error as shown
+   }
 
-  console.log({data});
-  
-
-if(error){
-  message.error('message')
-}
+   // Handle User Product Error (error from useGetUserProductApi)
+   if (userProductError && !hasShownUserError.current) {
+     message.error(
+       userProductError.message || 'An error occurred while fetching user products',
+     );
+     hasShownUserError.current = true; // Mark the user error as shown
+   }
+ }, [error, userProductError]);
   
 
 
@@ -64,16 +83,12 @@ if(error){
         {/* <CardTwo sales={data?.processProduct.totalSales} /> */}
         <CardTwo
           sales={
-            isAdmin
-              ? data?.processProduct.totalSales
-              : userProductData?.processProduct.totalSales
+              data?.processProduct.totalSales
           }
         />
         <CardThree
           product={
-            isAdmin
-              ? data?.processProduct.totalProduct
-              : userProductData?.processProduct.totalProduct
+               data?.processProduct.totalProduct
           }
         />
         {/* <CardThree product={data?.processProduct.totalProduct} /> */}

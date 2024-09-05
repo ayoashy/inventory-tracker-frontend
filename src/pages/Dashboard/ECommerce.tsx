@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import AddProductForm from '../../components/AddProductForm.tsx';
 
 import CardFour from '../../components/CardFour.tsx';
@@ -6,22 +7,47 @@ import CardTwo from '../../components/CardTwo.tsx';
 import { useAuth } from '../../context/AuthContext.tsx';
 
 import { useGetProductApi, useGetUserProductApi } from '../../data/hooks/product.ts';
+import { message } from 'antd';
 // import { useEffect } from 'react';
 
 const ECommerce = () => {
     const userData = useAuth()
     const isAdmin = userData?.user?.type === 'admin'
     
-  const { data, isLoading } = useGetUserProductApi();
-  const { data: userProductData, isLoading: userProductLoading } = useGetUserProductApi();
+  const { data, isLoading, error } = useGetProductApi();
+  const {
+    data: userProductData,
+    isLoading: userProductLoading,
+    error: userProductError,
+  } = useGetUserProductApi();
 
-  console.log({ userProductData });
+  
+ const hasShownAdminError = useRef(false);
+ const hasShownUserError = useRef(false);
+
+ useEffect(() => {
+   // Handle Admin Product Error (error from useGetProductApi)
+   if (error && !hasShownAdminError.current) {
+     message.error(
+       error.message || 'An error occurred while fetching admin products',
+     );
+     hasShownAdminError.current = true; // Mark the admin error as shown
+   }
+
+   // Handle User Product Error (error from useGetUserProductApi)
+   if (userProductData && !hasShownUserError.current) {
+     message.error(
+       userProductData.message ||
+         'An error occurred while fetching user products',
+     );
+     hasShownUserError.current = true; // Mark the user error as shown
+   }
+ }, [error, userProductData]);
   
   
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-        <CardTwo sales={userProductData?.processProduct.totalSales}/>
         <CardTwo
           sales={
             isAdmin
