@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { addProductApi, deleteProductApi, editProductApi, getProductApi, getUserProductApi } from "../api/product";
+import { addProductApi, deleteProductApi, editProductApi, getProductsApi, getUserProductsApi } from "../api/product";
 
 export const useAddProductApi = () => {
   const queryClient = useQueryClient();
@@ -15,7 +15,7 @@ export const useAddProductApi = () => {
 export const useGetProductApi = () => {
   return useQuery({
     queryKey: ['product'],
-    queryFn: getProductApi,
+    queryFn: getProductsApi,
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -23,8 +23,8 @@ export const useGetProductApi = () => {
 
 export const useGetUserProductApi = () => {
   return useQuery({
-    queryKey: ['product'],
-    queryFn: getUserProductApi,
+    queryKey: ['user-product'],
+    queryFn: getUserProductsApi,
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -36,7 +36,7 @@ export const useEditProductApi = () => {
   return useMutation({
     mutationFn: ({ id, post }: { id: string; post: any }) => editProductApi(id, post),
     onSuccess: () => {
-      queryClient.invalidateQueries(['product']);
+      queryClient.invalidateQueries(['product, user-product']);
     },
   });
 };

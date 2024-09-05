@@ -1,4 +1,4 @@
-import React, { FormEvent, useState,  } from 'react';
+import React, { FormEvent, useEffect, useState,  } from 'react';
 import { useLoginApi } from '../../data/hooks/auth';
 import { message } from 'antd';
 import { Link } from 'react-router-dom';
@@ -15,6 +15,11 @@ const Login: React.FC = () => {
     password: '',
   });
   const { mutateAsync, isLoading } = useLoginApi();
+
+  useEffect(()=>{
+    console.log({isLoading});
+    
+  },[isLoading])
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

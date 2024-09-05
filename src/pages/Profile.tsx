@@ -1,17 +1,12 @@
 import { FaSpinner } from 'react-icons/fa';
-import Loader from '../common/Loader';
 import Breadcrumb from '../components/Breadcrumb';
 import { useAuth } from '../context/AuthContext';
 import { useGetUserProductApi } from '../data/hooks/product';
 import CoverOne from '../images/cover/cover-01.png';
-import userSix from '../images/user/user-06.png';
 
 const Profile = () => {
   const userData = useAuth()
   const {data, isLoading} = useGetUserProductApi()
-  console.log(data);
-  
-  console.log({userData});
   
   return (
     <>
@@ -43,17 +38,15 @@ const Profile = () => {
             <div className="mx-auto mt-4.5 mb-5.5 grid max-w-94 grid-cols-3 rounded-md border border-stroke py-2.5 shadow-1 dark:border-strokedark dark:bg-[#37404F]">
               <div className="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-strokedark xsm:flex-row">
                 <span className="font-semibold text-black dark:text-white">
-                  {isLoading ? (
-                    <FaSpinner />
-                  ) : (
-                    data?.processProduct.totalProduct
-                  )}
+                  {
+                    data?.processProduct.totalProduct || 0
+                  }
                 </span>
                 <span className="text-sm">Product</span>
               </div>
               <div className="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-strokedark xsm:flex-row">
                 <span className="font-semibold text-black dark:text-white">
-                  {isLoading ? <FaSpinner /> : data?.processProduct.totalSales}
+                  { data?.processProduct.totalSales || 0}
                 </span>
                 <span className="text-sm">Sales</span>
               </div>
