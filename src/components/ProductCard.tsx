@@ -58,6 +58,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   const handleEdit = (product: DisplayProductType) => {
     localStorage.setItem('editData', JSON.stringify(product));
+    localStorage.setItem('isEditingData', JSON.stringify(true));
     navigate(`/?edit=${product._id}`);
   };
 
@@ -77,7 +78,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 </span>
               </div>
               <div className="flex items-center space-x-2 w-1/3">
-                <FaDollarSign className="text-green-500" />
                 <span className="text-gray-800 dark:text-gray-300">
                   ${prod.price.toFixed(2)}
                 </span>
@@ -107,7 +107,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 </span>
               </div>
               <div className="flex items-center space-x-2">
-                <FaDollarSign className="text-green-500" />
                 <span className="font-semibold text-gray-800 dark:text-gray-300">
                   ${totalPrice.toFixed(2)}
                 </span>
@@ -116,19 +115,30 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
         </div>
         {isAdmin && (
-          <div className="mt-4 flex justify-end space-x-2">
-            <button
-              onClick={() => handleEdit(product)}
-              className="p-2 text-blue-600 hover:text-blue-800 transition-colors duration-200"
+          <div className="mt-4 flex justify-between items-center">
+            <div
+              className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                product.authorId.type === 'admin'
+                  ? 'bg-green-200 text-green-800'
+                  : 'bg-yellow-200 text-yellow-800'
+              }`}
             >
-              <FaEdit className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => handleDelete(product._id)}
-              className="p-2 text-red-600 hover:text-red-800 transition-colors duration-200"
-            >
-              <FaTrash className="w-5 h-5" />
-            </button>
+              {product.authorId.name}
+            </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => handleEdit(product)}
+                className="p-2 text-blue-600 hover:text-blue-800 transition-colors duration-200"
+              >
+                <FaEdit className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => handleDelete(product._id)}
+                className="p-2 text-red-600 hover:text-red-800 transition-colors duration-200"
+              >
+                <FaTrash className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         )}
       </div>

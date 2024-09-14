@@ -22,6 +22,9 @@ const ECommerce = () => {
     error: userProductError,
   } = useGetUserProductApi();
 
+  console.log({ userProductError, error });
+  
+
   
  const hasShownAdminError = useRef(false);
  const hasShownUserError = useRef(false);

@@ -1,9 +1,6 @@
 import { RouterProvider } from 'react-router-dom';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { App as AntDesignApp } from 'antd';
-
-import React from 'react';
-import { QueryClient, QueryClientProvider } from 'react-query';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
@@ -11,7 +8,7 @@ import Register from './pages/Register';
 
 const router = createBrowserRouter([
   {
-    path: '/login',
+    path: '/',
     index: true,
     element: <Login />,
   },
@@ -30,7 +27,7 @@ const router = createBrowserRouter([
 
   {
     path: '/*',
-    element: <Navigate to="/login" />,
+    element: <Navigate to="/" />,
   },
 ]);
 

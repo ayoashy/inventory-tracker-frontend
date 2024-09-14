@@ -6,7 +6,7 @@ export const useAddProductApi = () => {
   return useMutation({
     mutationFn: addProductApi,
     onSuccess: () => {
-      queryClient.invalidateQueries(['product']);
+      queryClient.invalidateQueries(['product, user-product']);
     },
   });
 };
@@ -14,7 +14,7 @@ export const useAddProductApi = () => {
 
 export const useGetProductApi = () => {
   return useQuery({
-    queryKey: ['product'],
+    queryKey: ['product, user-product'],
     queryFn: getProductsApi,
     retry: false,
     refetchOnWindowFocus: false,
@@ -23,7 +23,7 @@ export const useGetProductApi = () => {
 
 export const useGetUserProductApi = () => {
   return useQuery({
-    queryKey: ['user-product'],
+    queryKey: ['user-product, product'],
     queryFn: getUserProductsApi,
     retry: false,
     refetchOnWindowFocus: false,
@@ -48,14 +48,8 @@ export const useDeleteProductApi = () => {
     mutationFn: ({ id }: { id: string; }) =>
       deleteProductApi(id),
     onSuccess: () => {
-      queryClient.invalidateQueries(['product']);
+      queryClient.invalidateQueries(['product, user-product']);
     },
-        // onError: (error: unknown) => {
-        //   if (error instanceof Error) {
-        //     return error.message;
-        //   }
-        //   return 'An unknown error occurred';
-        // },
   });
 };
 

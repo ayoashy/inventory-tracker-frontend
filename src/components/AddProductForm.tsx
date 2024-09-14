@@ -51,7 +51,6 @@ useEffect(()=>{
 
 
  const handleRemove = (i: number)=>{
-  let newProduct = [...products]
   const filteredProducts = products.filter((item, index)=> index !== i )
   setProducts(filteredProducts)
  }
@@ -71,7 +70,7 @@ const handleChange = (index: number,e: ChangeEvent<HTMLInputElement> )=>{
 }
 const {data, isLoading,} =  useGetUserApi()
 const {data: productData} =  useGetProductApi()
-const { mutateAsync,  } = useAddProductApi()
+const { mutateAsync, isLoading: addProductLoading, error: addProductError  } = useAddProductApi()
 const { mutateAsync: editMutateAsync } = useEditProductApi();
 
 const handleAddProduct = async  (e: any)=>{
@@ -92,7 +91,7 @@ const handleAddProduct = async  (e: any)=>{
 
 try {
   if(isInvalidInput){
-    await message.error('Product name can not be empty')
+    await message.error('Product name or price can not be empty')
     return
   }
 const response = await mutateAsync(postObject)
@@ -181,10 +180,10 @@ const handleSubmit = editId ? handleEditProduct : handleAddProduct;
             </div>
 
             <button
-              className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray"
-              disabled={isLoading}
+              className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray disabled:bg-gray disabled:text-black"
+              disabled={addProductLoading}
             >
-              {editId ? 'Update Product' : 'Add Product'}
+              {addProductLoading ? 'Loading...' : editId ? 'Update Product' : 'Add Product'}
             </button>
           </div>
         </form>

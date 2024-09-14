@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useState,  } from 'react';
+import React, { FormEvent, useEffect, useMemo, useState,  } from 'react';
 import { useLoginApi } from '../../data/hooks/auth';
 import { message } from 'antd';
 import { Link } from 'react-router-dom';
@@ -9,17 +9,14 @@ type LoginState = {
 };
 
 const Login: React.FC = () => {
-
   const [loginState, setLoginState] = useState<LoginState>({
     email: '',
     password: '',
   });
-  const { mutateAsync, isLoading } = useLoginApi();
+  const { mutateAsync, isLoading, isError, error } = useLoginApi();
+    const [showMessage, setShowMessage] = useState(false);
 
-  useEffect(()=>{
-    console.log({isLoading});
-    
-  },[isLoading])
+
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,15 +26,27 @@ const Login: React.FC = () => {
     try {
       const response = await mutateAsync(loginState);
 
-      if(response){
-
+      if (response) {
         await message.success('Login successful!Navigating...');
       }
-
     } catch (error: any) {
-      message.error(error);
+      setShowMessage(true);
+      await message.error('Something not right');
     }
-  }; 
+  };
+
+  // Handle error messaging when `isError` becomes true
+  useEffect(() => {
+    if (isError && error) {
+      message.error('error'); // Ensure the error is displayed only once
+    }
+  }, [isError, error]);
+
+   useMemo(() => {
+     if (showMessage) {
+       message.error('something could be done better');
+     }
+   }, [showMessage]);
 
   return (
     <section className="bg-white">

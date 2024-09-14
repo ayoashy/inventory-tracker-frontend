@@ -1,5 +1,5 @@
 import Breadcrumb from '../components/Breadcrumb';
-import { useState,useEffect } from "react";
+import { useState,useEffect, useRef } from "react";
 import { useAuth } from '../context/AuthContext';
 import { useUpdatePasswordApi } from '../data/hooks/auth';
 import { message } from 'antd';
@@ -10,14 +10,40 @@ export type UpdatePasswordType = {
 };
 const Settings = () => {
   const userData = useAuth();
-  const { mutateAsync } = useUpdatePasswordApi();
-  console.log(userData);
+  const { mutateAsync, isLoading: updatePasswordLoading, error: updatePasswordError } = useUpdatePasswordApi();
+  const [showMessage, setShowMessage] = useState(false)
   
   const [passwordObject, setPasswordObject] = useState<UpdatePasswordType>({currentPassword:'',
     newPassword: ''
   });
 
   const [updatePassword, setUpdatePassword] = useState(false)
+
+   const hasShownUpdatePasswordError = useRef(false);
+
+   console.log({ updatePasswordError });
+   
+
+
+ useEffect(() => {
+   if (updatePasswordError) {
+     message.error(
+       updatePasswordError?.message ||
+         'An error occurred while fetching admin products',
+     );
+
+    //  hasShownUpdatePasswordError.current = true;
+   }
+ }, [
+   updatePasswordError,
+  //  hasShownUpdatePasswordError.current,
+ ]);
+
+ useEffect(()=>{
+  if(showMessage){
+    message.error('something could be done better')
+  }
+ },[showMessage])
 
   const handleUpdate = async (e: any) => {
     e.preventDefault();
@@ -34,7 +60,7 @@ const Settings = () => {
         await message.success('Password updated successful!Navigating...');
       }
     } catch (error: any) {
-      message.error(error);
+     await message.error(error.message || 'Problem updating password');
     }
   };
 
@@ -284,10 +310,10 @@ const Settings = () => {
                       Cancel
                     </button>
                     <button
-                      className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-70"
+                      className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-70 disabled:bg-gray disabled:text-black"
                       type="submit"
                     >
-                      Update Password
+                      {updatePasswordLoading? 'Loading...' : 'Update Password'}
                     </button>
                   </div>
                 </form>
