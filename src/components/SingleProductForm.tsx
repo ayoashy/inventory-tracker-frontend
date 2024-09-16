@@ -4,7 +4,7 @@ import { ButtonsWithIcon } from './Buttons';
 
 type SingleProductFormType = {
   // handleRemove?: void;
-  handleRemove?: MouseEventHandler<HTMLAnchorElement> | undefined;
+  handleRemove: (i: number) => void;
   index: number;
   element: {
     name: string;
@@ -58,6 +58,8 @@ const SingleProductForm = (prop: SingleProductFormType) => {
             name='quantity'
           />
         </div>
+
+    {prop.index !== 0 &&    <button onClick={()=>prop.handleRemove(prop?.index)}>delete</button>}
       </div>
     </div>
   );

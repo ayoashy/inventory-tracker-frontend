@@ -58,7 +58,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   const handleEdit = (product: DisplayProductType) => {
     localStorage.setItem('editData', JSON.stringify(product));
-    localStorage.setItem('isEditingData', JSON.stringify(true));
     navigate(`/?edit=${product._id}`);
   };
 

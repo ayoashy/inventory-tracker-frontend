@@ -28,22 +28,28 @@ type ProductTypeExtend = ProductType & { _id?: string }
 
 const AddProductForm = () => {
   const [searchParams] = useSearchParams();
-  const editId = searchParams.get('edit');
- const [products, setProducts] = useState<ProductTypeExtend[]>([
-   { name: '', quantity: 1, price: 0 },
- ]);
-   const navigate = useNavigate();
+  // const navigate = useNavigate();
+  const [editId, setEditId] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [products, setProducts] = useState<ProductTypeExtend[]>([
+    { name: '', quantity: 1, price: 0 },
+  ]);
 
-useEffect(()=>{
-  if(editId){
-    let editData: string | EditDataType | null  = localStorage.getItem('editData')
-    if(editData){
-      editData = JSON.parse(editData) as EditDataType
-      const editProduct = editData?.products ;
-      setProducts(editProduct)
+  useEffect(() => {
+    const urlEditId = searchParams.get('edit');
+    const storedEditId = localStorage.getItem('editId');
+    const storedIsEditing = localStorage.getItem('isEditingData');
+
+    if (urlEditId || (storedEditId && storedIsEditing)) {
+      setEditId(urlEditId || storedEditId);
+      setIsEditing(true);
+      let editData = localStorage.getItem('editData');
+      if (editData) {
+        const parsedData = JSON.parse(editData) as EditDataType;
+        setProducts(parsedData.products);
+      }
     }
-  }
-},[])
+  }, [searchParams]);
 
  const handleAdd  = ()=>{
   setProducts([...products, {name:'', quantity: 1, price: 0}])
@@ -69,7 +75,6 @@ const handleChange = (index: number,e: ChangeEvent<HTMLInputElement> )=>{
   setProducts(newArray)
 }
 const {data, isLoading,} =  useGetUserApi()
-const {data: productData} =  useGetProductApi()
 const { mutateAsync, isLoading: addProductLoading, error: addProductError  } = useAddProductApi()
 const { mutateAsync: editMutateAsync } = useEditProductApi();
 
@@ -107,11 +112,6 @@ setProducts([{name: '', quantity: 1, price: 0}])
 }
 
 const handleEditProduct = async (e: any) => {
-  const postObject = {
-    products,
-    authorId: data.user._id,
-  };
-
   let isInvalidInput;
 
   for (let i = 0; i < products.length; i++) {
@@ -140,7 +140,7 @@ const handleEditProduct = async (e: any) => {
       message.success('Product successfully updated');
     }
     localStorage.removeItem('editData');
-    navigate('/')
+    // navigate('/')
 
 
     setProducts([{ name: '', quantity: 1, price: 0 }]);
@@ -165,7 +165,7 @@ const handleSubmit = editId ? handleEditProduct : handleAddProduct;
             {products.map((product, index) => (
               <SingleProductForm
                 key={index}
-                handleRemove={() => handleRemove(index)}
+                handleRemove={handleRemove}
                 index={index}
                 element={product}
                 handleChange={handleChange}
@@ -173,9 +173,9 @@ const handleSubmit = editId ? handleEditProduct : handleAddProduct;
             ))}
 
             <div className="mb-4.5">
-              <label className="mb-2.5 block text-black dark:text-white">
+              {/* <label className="mb-2.5 block text-black dark:text-white">
                 Subject
-              </label>
+              </label> */}
               <ButtonsWithIcon text="Add More Product" handleAdd={handleAdd} />
             </div>
 
@@ -183,7 +183,11 @@ const handleSubmit = editId ? handleEditProduct : handleAddProduct;
               className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray disabled:bg-gray disabled:text-black"
               disabled={addProductLoading}
             >
-              {addProductLoading ? 'Loading...' : editId ? 'Update Product' : 'Add Product'}
+              {addProductLoading
+                ? 'Loading...'
+                : editId
+                ? 'Update Product'
+              : 'Add Product'}
             </button>
           </div>
         </form>
