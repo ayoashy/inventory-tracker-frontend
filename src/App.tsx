@@ -1,35 +1,25 @@
 import { AuthProvider, useAuth } from './context/AuthContext';
 import UnauthenticatedApp from './Unauthenticated';
 import AdminApp from './Admin';
-import { AuthDataContext } from './context/authDataContext';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
+const SelectApp: React.FC = () => {
+  const { user, isLoading, error } = useAuth();
 
-const SelectApp = () => {
-  console.log('shouting from select app');
-  
-  const data = useAuth();
-
-  let app;
-
-  if (data){
-    app = <AdminApp />
-  }
-  else{
-    app = <UnauthenticatedApp />
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
 
-  console.log(app);
-  
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
-  return (
-    <AuthDataContext.Provider value={data}>{app}</AuthDataContext.Provider>
-  );
+  return user ? <AdminApp /> : <UnauthenticatedApp />;
 };
 
 const queryClient = new QueryClient();
 
-const App = () => {
+const App: React.FC = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>

@@ -1,32 +1,26 @@
-import React, { FormEvent, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { FormEvent, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useResetPasswordApi } from '../../data/hooks/auth';
 import { message } from 'antd';
 
-type ResetPasswordType = {
-  resetToken: string | undefined;
-  password: string | undefined;
-};
-
 const ResetPassword = () => {
   const { resetToken } = useParams();
-  const { data, isLoading, mutateAsync } = useResetPasswordApi();
-  // const [password, setPassword] = useState({ password: '' });
+  const navigate = useNavigate();
+  const { mutateAsync, isLoading } = useResetPasswordApi();
   const [password, setPassword] = useState('');
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await mutateAsync({ resetToken, password });
-      if (response) {
-        console.log(response);
-        await message.success('Password successfully changed!');
-      }
+      await mutateAsync({ resetToken, password });
+      await message.success('Password successfully changed!');
+      navigate('/login'); // Redirect to login page after successful password reset
     } catch (error: any) {
-      await message.error(error|| "An error occurred with the response");
+      await message.error(
+        error?.message || 'An error occurred while resetting the password',
+      );
     }
   };
-
   return (
     <section className="bg-white">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-12">

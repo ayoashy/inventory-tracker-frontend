@@ -9,10 +9,6 @@ const unauthenticatedApi = axios.create({
 
 const getAuthenticatedApi = () => {
   const token = localStorage.getItem('token');
-  console.log('token--------', token);
-  console.log('baseURL--------', import.meta.env.VITE_BASE_URL);
-  
-  
   const authenticatedApi = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL,
     headers: {

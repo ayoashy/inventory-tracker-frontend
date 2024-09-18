@@ -1,16 +1,16 @@
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react';
 import { ButtonsWithIcon } from './Buttons';
 import SingleProductForm from './SingleProductForm';
-import { useAddProductApi, useEditProductApi, useGetProductApi } from '../data/hooks/product';
+import { useAddProductApi, useEditProductApi } from '../data/hooks/product';
 import { useGetUserApi } from '../data/hooks/auth';
 import { message } from 'antd';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 type ProductType = {
- name: string;
- price: number;
- quantity: number;
-}
+  name: string;
+  price: number;
+  quantity: number;
+};
 
 type EditDataType = {
   authorId: {
@@ -23,17 +23,19 @@ type EditDataType = {
   products: ProductType[];
 };
 
-type ProductTypeExtend = ProductType & { _id?: string }
-
+type ProductTypeExtend = ProductType & { _id?: string }; // ... existing type definitions ...
 
 const AddProductForm = () => {
   const [searchParams] = useSearchParams();
-  // const navigate = useNavigate();
   const [editId, setEditId] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [products, setProducts] = useState<ProductTypeExtend[]>([
     { name: '', quantity: 1, price: 0 },
   ]);
+
+  const { data: userData } = useGetUserApi();
+  const { mutateAsync: addProduct, isLoading: addProductLoading } =
+    useAddProductApi();
+  const { mutateAsync: editProduct } = useEditProductApi();
 
   useEffect(() => {
     const urlEditId = searchParams.get('edit');
@@ -42,8 +44,7 @@ const AddProductForm = () => {
 
     if (urlEditId || (storedEditId && storedIsEditing)) {
       setEditId(urlEditId || storedEditId);
-      setIsEditing(true);
-      let editData = localStorage.getItem('editData');
+      const editData = localStorage.getItem('editData');
       if (editData) {
         const parsedData = JSON.parse(editData) as EditDataType;
         setProducts(parsedData.products);
@@ -51,107 +52,56 @@ const AddProductForm = () => {
     }
   }, [searchParams]);
 
- const handleAdd  = ()=>{
-  setProducts([...products, {name:'', quantity: 1, price: 0}])
- }
+  const handleAdd = () =>
+    setProducts([...products, { name: '', quantity: 1, price: 0 }]);
 
+  const handleRemove = (index: number) => {
+    setProducts(products.filter((_, i) => i !== index));
+  };
 
- const handleRemove = (i: number)=>{
-  const filteredProducts = products.filter((item, index)=> index !== i )
-  setProducts(filteredProducts)
- }
- const {data: getProductData,} = useGetProductApi()
- console.log({getProductData});
+  const handleChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setProducts(
+      products.map((prod, i) =>
+        i === index ? { ...prod, [name]: value } : prod,
+      ),
+    );
+  };
 
+  const validateProducts = () => {
+    return products.every(
+      (product) => product.name !== '' && product.price !== 0 && product.quantity !== 0,
+    );
+  };
 
-const handleChange = (index: number,e: ChangeEvent<HTMLInputElement> )=>{
-  const newArray  = products.map((prod, ind)=>{
-    if(ind === index){
-      return {...prod, [e.target.name]: e.target.value}
-    }else{
-      return prod
-    }
-  })
-  setProducts(newArray)
-}
-const {data, isLoading,} =  useGetUserApi()
-const { mutateAsync, isLoading: addProductLoading, error: addProductError  } = useAddProductApi()
-const { mutateAsync: editMutateAsync } = useEditProductApi();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-const handleAddProduct = async  (e: any)=>{
-  const postObject = {
-    products,
-    authorId: data.user._id
-  }
-
-  let isInvalidInput;
-
-  for (let i = 0; i < products.length; i++) {
-    if(products[i].name === '' || products[i].price === 0 ){
-      isInvalidInput = true;
-    }
-  }
-
-  e.preventDefault()
-
-try {
-  if(isInvalidInput){
-    await message.error('Product name or price can not be empty')
-    return
-  }
-const response = await mutateAsync(postObject)
-if(response){
-   message.success('Product successfully added')
-}
-
-setProducts([{name: '', quantity: 1, price: 0}])
-} catch (error: any) {
-  await message.error(error)
-  
-}
-}
-
-const handleEditProduct = async (e: any) => {
-  let isInvalidInput;
-
-  for (let i = 0; i < products.length; i++) {
-    if (products[i].name === '' || products[i].price === 0) {
-      isInvalidInput = true;
-    }
-  }
-
-  e.preventDefault();
-
-  try {
-    if (isInvalidInput) {
-      await message.error('Product name can not be empty');
+    if (!validateProducts()) {
+      await message.error('Product name or price cannot be empty');
       return;
     }
-    const formattedProduct = products.map((product)=>{
-      // remove _id prop from product object
-      const { _id, ...rest } = product;
-      return rest;
-    })
-    const response = await editMutateAsync({
-      id: editId as string,
-      post: { products: formattedProduct },
-    });
-    if (response) {
-      message.success('Product successfully updated');
+
+    try {
+      if (editId) {
+        const formattedProducts = products.map(({ _id, ...rest }) => rest);
+        await editProduct({
+          id: editId,
+          post: { products: formattedProducts },
+        });
+        message.success('Product successfully updated');
+        localStorage.removeItem('editData');
+        setEditId(null);
+      } else {
+        await addProduct({ products, authorId: userData.user._id });
+        message.success('Product successfully added');
+      }
+      setProducts([{ name: '', quantity: 1, price: 0 }]);
+    } catch (error: any) {
+      await message.error(error.toString());
     }
-    localStorage.removeItem('editData');
-    // navigate('/')
+  };
 
-
-    setProducts([{ name: '', quantity: 1, price: 0 }]);
-  } catch (error: any) {
-    await message.error(error);
-  }
-};
-
-const handleSubmit = editId ? handleEditProduct : handleAddProduct;
-
- 
   return (
     <div>
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark mt-5">
@@ -160,7 +110,7 @@ const handleSubmit = editId ? handleEditProduct : handleAddProduct;
             {editId ? 'Update Product' : 'Add Product'}
           </h3>
         </div>
-        <form action="#" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <div className="p-6.5">
             {products.map((product, index) => (
               <SingleProductForm
@@ -173,9 +123,6 @@ const handleSubmit = editId ? handleEditProduct : handleAddProduct;
             ))}
 
             <div className="mb-4.5">
-              {/* <label className="mb-2.5 block text-black dark:text-white">
-                Subject
-              </label> */}
               <ButtonsWithIcon text="Add More Product" handleAdd={handleAdd} />
             </div>
 
@@ -187,13 +134,13 @@ const handleSubmit = editId ? handleEditProduct : handleAddProduct;
                 ? 'Loading...'
                 : editId
                 ? 'Update Product'
-              : 'Add Product'}
+                : 'Add Product'}
             </button>
           </div>
         </form>
       </div>
     </div>
   );
-}
+};
 
-export default AddProductForm
+export default AddProductForm;

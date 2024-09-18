@@ -1,11 +1,7 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import Loader from '../common/Loader';
 import { useGetUserApi } from '../data/hooks/auth';
+
 type UserContextType = {
   email: string;
   name: string;
@@ -15,28 +11,47 @@ type UserContextType = {
 };
 
 export type UserType = {
-  user: UserContextType;
+  user: UserContextType | null;
+  isLoading: boolean;
+  error: string | null;
 };
 
 const AuthContext = createContext<UserType | undefined>(undefined);
 
-const AuthProvider = (props: any) => {
-  const [user, setUser] = useState(null);
+const AuthProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
+  const [authState, setAuthState] = useState<UserType>({
+    user: null,
+    isLoading: true,
+    error: null,
+  });
 
-  const { data, isLoading } = useGetUserApi(); 
+  const { data, isLoading, error } = useGetUserApi();
 
   useEffect(() => {
-    if (!data) return;
-    setUser(data);
-    console.log('useffect thing here');
-  }, [data]);
+    if (!isLoading) {
+      setAuthState({
+        user: data?.user || null,
+        isLoading: false,
+        error: error ? (error as Error).message || 'An error occurred' : null,
+      });
+    }
+  }, [data, isLoading, error]);
 
-  if (isLoading) {
+  if (authState.isLoading) {
     return <Loader />;
   }
 
-  return <AuthContext.Provider {...props} value={user} />;
+  return (
+    <AuthContext.Provider value={authState}>{children}</AuthContext.Provider>
+  );
 };
 
-const useAuth = () => useContext(AuthContext);
+const useAuth = (): UserType => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
 export { useAuth, AuthProvider };

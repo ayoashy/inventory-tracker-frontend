@@ -20,8 +20,6 @@ const Settings = () => {
   const [updatePassword, setUpdatePassword] = useState(false)
 
    const hasShownUpdatePasswordError = useRef(false);
-
-   console.log({ updatePasswordError });
    
 
 

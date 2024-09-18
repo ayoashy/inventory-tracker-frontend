@@ -23,8 +23,6 @@ export type UpdatePasswordType = {
 
 // Generic error handler
 export const handleApiError = (error: any): never => {
-  console.log('Error:', error);
-
   // if (error.code === 'ERR_BAD_REQUEST' || error.message === 'Network Error') {
   if ( error.message === 'Network Error') {
     throw new Error('Network Error');
@@ -37,10 +35,8 @@ export const handleApiError = (error: any): never => {
     throw new Error("Bad Network")
   }
     if (error.response?.data?.error) {
-      console.log('Request error:', error.request);
       throw new Error(error.response.data.error);
     } else if (error.response) {
-      console.log('Response error:', error.response);
       throw new Error('An error occurred with the response');
     } else {
       throw new Error(error.message || 'An unknown error occurred');

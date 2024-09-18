@@ -30,7 +30,6 @@ export const useLoginApi = () => {
   return useMutation({
     mutationFn: loginApi,
     onSuccess: (response) => {
-      console.log('response in hook', response);
       if (response && response.token) {
         localStorage.setItem('token', response.token);
       }

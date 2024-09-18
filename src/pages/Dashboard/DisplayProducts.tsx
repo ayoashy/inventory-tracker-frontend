@@ -2,16 +2,17 @@ import Loader from '../../common/Loader';
 import CardFour from '../../components/CardFour';
 import CardThree from '../../components/CardThree';
 import CardTwo from '../../components/CardTwo';
-import { useDeleteProductApi, useGetProductApi, useGetUserProductApi } from '../../data/hooks/product';
-import { useGetUserApi } from '../../data/hooks/auth';
-import {  message } from 'antd';
+import {
+  useGetProductApi,
+  useGetUserProductApi,
+} from '../../data/hooks/product';
+import { message } from 'antd';
 import { useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { FiShoppingCart } from 'react-icons/fi';
 import ProductCard from '../../components/ProductCard';
 import Breadcrumb from '../../components/Breadcrumb';
-
 
 type ProductType = {
   name: string;
@@ -31,52 +32,86 @@ type DisplayProductType = {
 };
 
 const DisplayProduct = () => {
-  console.log('display renders');
-  
-  const { data: AdminProductData, isLoading, error } = useGetProductApi();
-  const {
-    data: userProductData,
-    isLoading: userProductLoading,
-    error: userProductError,
-  } = useGetUserProductApi();
+  // const { data: AdminProductData, isLoading, error } = useGetProductApi();
+  // const {
+  //   data: userProductData,
+  //   isLoading: userProductLoading,
+  //   error: userProductError,
+  // } = useGetUserProductApi();
 
-  const userData = useAuth();
+  // const userData = useAuth();
 
-  const isAdmin = userData?.user?.type === 'admin';
+  // const isAdmin = userData?.user?.type === 'admin';
 
-  let data;
-  if(isAdmin){
-    data = AdminProductData
-  }else{
-    data = userProductData
-  }
+  // let data;
+  // if (isAdmin) {
+  //   data = AdminProductData;
+  // } else {
+  //   data = userProductData;
+  // }
 
-  const emptyState =
-    (userData?.user.type === 'sales' && userProductData?.products.length < 1) ||
-    (userData?.user.type === 'admin' && AdminProductData?.products.length < 1);
-  
- const hasShownAdminError = useRef(false);
- const hasShownUserError = useRef(false);
+  // const emptyState =
+  //   (userData?.user.type === 'sales' && userProductData?.products.length < 1) ||
+  //   (userData?.user.type === 'admin' && AdminProductData?.products.length < 1);
 
- useEffect(() => {
-   // Handle Admin Product Error (error from useGetProductApi)
-   if (error && !hasShownAdminError.current) {
-     message.error(error.message||'An error occurred while fetching admin products');
-     hasShownAdminError.current = true; // Mark the admin error as shown
-   }
+  // const hasShownAdminError = useRef(false);
+  // const hasShownUserError = useRef(false);
 
-   // Handle User Product Error (error from useGetUserProductApi)
-   if (userProductError && !hasShownUserError.current) {
-     message.error(
-       userProductError.message || 'An error occurred while fetching user products',
-     );
-     hasShownUserError.current = true; // Mark the user error as shown
-   }
- }, [error, userProductError]);
-  
+  // useEffect(() => {
+  //   // Handle Admin Product Error (error from useGetProductApi)
+  //   if (error && !hasShownAdminError.current) {
+  //     message.error(
+  //       error.message || 'An error occurred while fetching admin products',
+  //     );
+  //     hasShownAdminError.current = true; // Mark the admin error as shown
+  //   }
 
+  //   // Handle User Product Error (error from useGetUserProductApi)
+  //   if (userProductError && !hasShownUserError.current) {
+  //     message.error(
+  //       userProductError.message ||
+  //         'An error occurred while fetching user products',
+  //     );
+  //     hasShownUserError.current = true; // Mark the user error as shown
+  //   }
+  // }, [error, userProductError]);
 
-  if (isLoading) return <Loader />;
+  // if (isLoading) return <Loader />;
+
+    const { user } = useAuth();
+    const isAdmin = user?.type === 'admin';
+
+    const {
+      data: adminProductData,
+      isLoading: adminLoading,
+      error: adminError,
+    } = useGetProductApi();
+    const {
+      data: userProductData,
+      isLoading: userLoading,
+      error: userError,
+    } = useGetUserProductApi();
+
+    const data = isAdmin ? adminProductData : userProductData;
+    const isLoading = isAdmin ? adminLoading : userLoading;
+    const error = isAdmin ? adminError : userError;
+
+    const emptyState =
+      (user?.type === 'sales' && userProductData?.products.length < 1) ||
+      (user?.type === 'admin' && adminProductData?.products.length < 1);
+
+    const hasShownError = useRef(false);
+
+    useEffect(() => {
+      if (error && !hasShownError.current) {
+        message.error(
+          error.message || 'An error occurred while fetching products',
+        );
+        hasShownError.current = true;
+      }
+    }, [error]);
+
+    if (isLoading) return <Loader />;
 
   return (
     <div className="space-y-10">

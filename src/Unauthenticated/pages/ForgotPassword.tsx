@@ -16,7 +16,6 @@ const ForgotPassword = () => {
     try {
       const response = await mutateAsync(recoverState);
       if (response) {
-        console.log(response);
         await message.success('Reset password link sent to your email');
       }
     } catch (error: any) {
