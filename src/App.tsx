@@ -10,9 +10,9 @@ const SelectApp: React.FC = () => {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
+  // if (error) {
+  //   return <div>Error: {error}</div>;
+  // }
 
   return user ? <AdminApp /> : <UnauthenticatedApp />;
 };

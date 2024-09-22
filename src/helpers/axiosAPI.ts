@@ -8,7 +8,7 @@ const unauthenticatedApi = axios.create({
 });
 
 const getAuthenticatedApi = () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('invoice-auth-token');
   const authenticatedApi = axios.create({
     baseURL: import.meta.env.VITE_BASE_URL,
     headers: {

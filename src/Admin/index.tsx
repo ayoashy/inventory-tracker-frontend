@@ -7,6 +7,7 @@ import ECommerce from '../pages/Dashboard/ECommerce';
 import Profile from '../pages/Profile';
 import Settings from '../pages/Settings';
 import DisplayProduct from '../pages/Dashboard/DisplayProducts';
+import { AuthProvider } from '../context/AuthContext';
 
 const router = createBrowserRouter([
   {
@@ -46,7 +47,9 @@ const router = createBrowserRouter([
 
 const AdminApp = () => (
   <AntDesignApp>
-    <RouterProvider router={router} />
+      {/* <AuthProvider> */}
+      <RouterProvider router={router} />
+      {/* </AuthProvider> */}
   </AntDesignApp>
 );
 export default AdminApp;

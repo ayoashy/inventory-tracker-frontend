@@ -18,8 +18,7 @@ export const useRegisterApi = () => {
     mutationFn: registerApi,
     onSuccess: (response)=>{
       if(response && response.token){
-localStorage.setItem('token', response.token);
-
+localStorage.setItem('invoice-auth-token', response.token);
       }
 queryClient.invalidateQueries(['user'])
     }
@@ -31,7 +30,7 @@ export const useLoginApi = () => {
     mutationFn: loginApi,
     onSuccess: (response) => {
       if (response && response.token) {
-        localStorage.setItem('token', response.token);
+        localStorage.setItem('invoice-auth-token', response.token);
       }
       queryClient.invalidateQueries(['user']);
     },
