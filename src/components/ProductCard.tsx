@@ -1,6 +1,6 @@
 import { message } from "antd";
 import { useEffect } from "react";
-import { FaBox, FaCalculator, FaCubes, FaDollarSign, FaEdit, FaTrash } from "react-icons/fa";
+import { FaBox, FaCalculator, FaCubes, FaEdit, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useDeleteProductApi } from "../data/hooks/product";
 import { useGetUserApi } from "../data/hooks/auth";
@@ -29,22 +29,22 @@ type ProductCardProps = {
 const ProductCard = ({ product }: ProductCardProps) => {
   const deleteProductMutation = useDeleteProductApi();
   const { error: deleteError } = deleteProductMutation;
-  const { data: userData, isLoading } = useGetUserApi();
+  const { data: userData } = useGetUserApi();
   const navigate = useNavigate();
   const isAdmin = userData?.user?.type === 'admin';
 
 
   useEffect(() => {
     if (deleteProductMutation.isError) {
-      message.error('Unable to delete product' as string);
+      message.error(deleteError.message || 'Unknown error');
     }
     if (deleteProductMutation.isSuccess) {
       message.success('Product deleted successfully');
     }
   }, [deleteProductMutation.isError, deleteProductMutation.isSuccess]);
 
-  const handleDelete = (id: string) => {
-    deleteProductMutation.mutateAsync({ id });
+  const handleDelete = async (id: string) => {
+      deleteProductMutation.mutateAsync({ id });
   };
 
   const totalQuantity = product.products.reduce(

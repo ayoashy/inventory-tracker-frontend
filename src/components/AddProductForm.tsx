@@ -98,7 +98,7 @@ const AddProductForm = () => {
       }
       setProducts([{ name: '', quantity: 1, price: 0 }]);
     } catch (error: any) {
-      await message.error(error.toString());
+      await message.error(error.message|| "unknown error");
     }
   };
 

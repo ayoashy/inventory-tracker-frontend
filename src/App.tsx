@@ -4,15 +4,11 @@ import AdminApp from './Admin';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
 const SelectApp: React.FC = () => {
-  const { user, isLoading, error } = useAuth();
+  const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return <div>Loading...</div>;
   }
-
-  // if (error) {
-  //   return <div>Error: {error}</div>;
-  // }
 
   return user ? <AdminApp /> : <UnauthenticatedApp />;
 };

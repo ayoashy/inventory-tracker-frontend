@@ -32,52 +32,6 @@ type DisplayProductType = {
 };
 
 const DisplayProduct = () => {
-  // const { data: AdminProductData, isLoading, error } = useGetProductApi();
-  // const {
-  //   data: userProductData,
-  //   isLoading: userProductLoading,
-  //   error: userProductError,
-  // } = useGetUserProductApi();
-
-  // const userData = useAuth();
-
-  // const isAdmin = userData?.user?.type === 'admin';
-
-  // let data;
-  // if (isAdmin) {
-  //   data = AdminProductData;
-  // } else {
-  //   data = userProductData;
-  // }
-
-  // const emptyState =
-  //   (userData?.user.type === 'sales' && userProductData?.products.length < 1) ||
-  //   (userData?.user.type === 'admin' && AdminProductData?.products.length < 1);
-
-  // const hasShownAdminError = useRef(false);
-  // const hasShownUserError = useRef(false);
-
-  // useEffect(() => {
-  //   // Handle Admin Product Error (error from useGetProductApi)
-  //   if (error && !hasShownAdminError.current) {
-  //     message.error(
-  //       error.message || 'An error occurred while fetching admin products',
-  //     );
-  //     hasShownAdminError.current = true; // Mark the admin error as shown
-  //   }
-
-  //   // Handle User Product Error (error from useGetUserProductApi)
-  //   if (userProductError && !hasShownUserError.current) {
-  //     message.error(
-  //       userProductError.message ||
-  //         'An error occurred while fetching user products',
-  //     );
-  //     hasShownUserError.current = true; // Mark the user error as shown
-  //   }
-  // }, [error, userProductError]);
-
-  // if (isLoading) return <Loader />;
-
     const { user } = useAuth();
     const isAdmin = user?.type === 'admin';
 
@@ -147,6 +101,29 @@ const DisplayProduct = () => {
           </div>
         </div>
       )}
+      {(adminError || userError) && (
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md shadow-sm">
+          <div className="flex items-center">
+            <svg
+              className="h-6 w-6 mr-2"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <p className="font-semibold">Error fetching products</p>
+          </div>
+          <p className="mt-2 text-sm">
+            Please try refreshing the page or contact support if the problem
+            persists.
+          </p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {data?.products?.map((product: DisplayProductType) => (
           <ProductCard key={product._id} product={product} />

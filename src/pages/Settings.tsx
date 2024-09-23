@@ -1,47 +1,24 @@
 import Breadcrumb from '../components/Breadcrumb';
-import { useState,useEffect, useRef } from "react";
+import { useState } from "react";
 import { useAuth } from '../context/AuthContext';
 import { useUpdatePasswordApi } from '../data/hooks/auth';
 import { message } from 'antd';
 
 export type UpdatePasswordType = {
   currentPassword: string 
-  newPassword: string 
+  newPassword: string
+  confirmNewPassword: string;
 };
 const Settings = () => {
   const userData = useAuth();
-  const { mutateAsync, isLoading: updatePasswordLoading, error: updatePasswordError } = useUpdatePasswordApi();
-  const [showMessage, setShowMessage] = useState(false)
+  const { mutateAsync, isLoading: updatePasswordLoading } = useUpdatePasswordApi();
   
   const [passwordObject, setPasswordObject] = useState<UpdatePasswordType>({currentPassword:'',
-    newPassword: ''
+    newPassword: '',
+    confirmNewPassword: ''
   });
 
   const [updatePassword, setUpdatePassword] = useState(false)
-
-   const hasShownUpdatePasswordError = useRef(false);
-   
-
-
- useEffect(() => {
-   if (updatePasswordError) {
-     message.error(
-       updatePasswordError?.message ||
-         'An error occurred while fetching admin products',
-     );
-
-    //  hasShownUpdatePasswordError.current = true;
-   }
- }, [
-   updatePasswordError,
-  //  hasShownUpdatePasswordError.current,
- ]);
-
- useEffect(()=>{
-  if(showMessage){
-    message.error('something could be done better')
-  }
- },[showMessage])
 
   const handleUpdate = async (e: any) => {
     e.preventDefault();
@@ -50,6 +27,10 @@ const Settings = () => {
       passwordObject.newPassword.length < 6
     ) {
       return message.error('Password should be atleast 6 characters');
+    }
+
+    if(passwordObject.newPassword !== passwordObject.confirmNewPassword){
+            return message.error('New password do not match');
     }
     try {
       const response = await mutateAsync({currentPassword: passwordObject.currentPassword, newPassword: passwordObject.newPassword});
@@ -188,13 +169,12 @@ const Settings = () => {
                     />
                   </div>
 
-                 
                   <div className="flex justify-ends gap-4.5">
                     <button
                       className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:shadow-1 disabled:bg-gray disabled:text-black"
                       type="submit"
                       disabled={updatePassword}
-                      onClick={()=>setUpdatePassword(true)}
+                      onClick={() => setUpdatePassword(true)}
                     >
                       Update Password
                     </button>
@@ -203,121 +183,169 @@ const Settings = () => {
               </div>
             </div>
           </div>
-{   updatePassword &&       <div className="col-span-5 xl:col-span-2">
-            <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-              <div className="border-b border-stroke py-4 px-7 dark:border-strokedark">
-                <h3 className="font-medium text-black dark:text-white">
-                  Update Password
-                </h3>
-              </div>
-              <div className="p-7">
-                <form onSubmit={handleUpdate}>
-                  <div className="w-full  mb-4">
-                    <label
-                      className="mb-3 block text-sm font-medium text-black dark:text-white"
-                      htmlFor="password"
-                    >
-                      Current Password
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-4.5 top-4">
-                        <svg
-                          className="fill-current"
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <g opacity="0.8">
-                            <path
-                              fillRule="evenodd"
-                              clipRule="evenodd"
-                              d="M12 2C9.23858 2 7 4.23858 7 7V10H5C4.44772 10 4 10.4477 4 11V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V11C20 10.4477 19.5523 10 19 10H17V7C17 4.23858 14.7614 2 12 2ZM9 10V7C9 5.34315 10.3431 4 12 4C13.6569 4 15 5.34315 15 7V10H9ZM6 12H18V19H6V12ZM12 14C12.5523 14 13 14.4477 13 15V17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17V15C11 14.4477 11.4477 14 12 14Z"
-                              fill=""
-                            />
-                          </g>
-                        </svg>
-                      </span>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                        type="password"
-                        name="password"
-                        id="password"
-                        value={passwordObject.currentPassword}
-                        onChange={(e) =>
-                          setPasswordObject({
-                            ...passwordObject,
-                            currentPassword: e.target.value,
-                          })
-                        }
-                        placeholder="Enter your password"
-                      />
+          {updatePassword && (
+            <div className="col-span-5 xl:col-span-2">
+              <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+                <div className="border-b border-stroke py-4 px-7 dark:border-strokedark">
+                  <h3 className="font-medium text-black dark:text-white">
+                    Update Password
+                  </h3>
+                </div>
+                <div className="p-7">
+                  <form onSubmit={handleUpdate}>
+                    <div className="w-full  mb-4">
+                      <label
+                        className="mb-3 block text-sm font-medium text-black dark:text-white"
+                        htmlFor="password"
+                      >
+                        Current Password
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4.5 top-4">
+                          <svg
+                            className="fill-current"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <g opacity="0.8">
+                              <path
+                                fillRule="evenodd"
+                                clipRule="evenodd"
+                                d="M12 2C9.23858 2 7 4.23858 7 7V10H5C4.44772 10 4 10.4477 4 11V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V11C20 10.4477 19.5523 10 19 10H17V7C17 4.23858 14.7614 2 12 2ZM9 10V7C9 5.34315 10.3431 4 12 4C13.6569 4 15 5.34315 15 7V10H9ZM6 12H18V19H6V12ZM12 14C12.5523 14 13 14.4477 13 15V17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17V15C11 14.4477 11.4477 14 12 14Z"
+                                fill=""
+                              />
+                            </g>
+                          </svg>
+                        </span>
+                        <input
+                          className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                          type="password"
+                          name="password"
+                          id="password"
+                          value={passwordObject.currentPassword}
+                          onChange={(e) =>
+                            setPasswordObject({
+                              ...passwordObject,
+                              currentPassword: e.target.value,
+                            })
+                          }
+                          placeholder="Enter your password"
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="w-full mb-4">
-                    <label
-                      className="mb-3 block text-sm font-medium text-black dark:text-white"
-                      htmlFor="password"
-                    >
-                      New Password
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-4.5 top-4">
-                        <svg
-                          className="fill-current"
-                          width="20"
-                          height="20"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <g opacity="0.8">
-                            <path
-                              fillRule="evenodd"
-                              clipRule="evenodd"
-                              d="M12 2C9.23858 2 7 4.23858 7 7V10H5C4.44772 10 4 10.4477 4 11V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V11C20 10.4477 19.5523 10 19 10H17V7C17 4.23858 14.7614 2 12 2ZM9 10V7C9 5.34315 10.3431 4 12 4C13.6569 4 15 5.34315 15 7V10H9ZM6 12H18V19H6V12ZM12 14C12.5523 14 13 14.4477 13 15V17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17V15C11 14.4477 11.4477 14 12 14Z"
-                              fill=""
-                            />
-                          </g>
-                        </svg>
-                      </span>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
-                        type="password"
-                        name="password"
-                        id="password"
-                        value={passwordObject.newPassword}
-                        onChange={(e) =>
-                          setPasswordObject({
-                            ...passwordObject,
-                            newPassword: e.target.value,
-                          })
-                        }
-                        placeholder="Enter your password"
-                      />
+                    <div className="w-full mb-4">
+                      <label
+                        className="mb-3 block text-sm font-medium text-black dark:text-white"
+                        htmlFor="password"
+                      >
+                        New Password
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4.5 top-4">
+                          <svg
+                            className="fill-current"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <g opacity="0.8">
+                              <path
+                                fillRule="evenodd"
+                                clipRule="evenodd"
+                                d="M12 2C9.23858 2 7 4.23858 7 7V10H5C4.44772 10 4 10.4477 4 11V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V11C20 10.4477 19.5523 10 19 10H17V7C17 4.23858 14.7614 2 12 2ZM9 10V7C9 5.34315 10.3431 4 12 4C13.6569 4 15 5.34315 15 7V10H9ZM6 12H18V19H6V12ZM12 14C12.5523 14 13 14.4477 13 15V17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17V15C11 14.4477 11.4477 14 12 14Z"
+                                fill=""
+                              />
+                            </g>
+                          </svg>
+                        </span>
+                        <input
+                          className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                          type="password"
+                          name="password"
+                          id="password"
+                          value={passwordObject.newPassword}
+                          onChange={(e) =>
+                            setPasswordObject({
+                              ...passwordObject,
+                              newPassword: e.target.value,
+                            })
+                          }
+                          placeholder="Enter your new password"
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="flex justify-end gap-4.5">
-                    <button
-                      className="flex justify-center rounded border border-stroke py-2 px-6 font-medium text-black hover:shadow-1 dark:border-strokedark dark:text-white"
-                      type="submit"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-70 disabled:bg-gray disabled:text-black"
-                      type="submit"
-                    >
-                      {updatePasswordLoading? 'Loading...' : 'Update Password'}
-                    </button>
-                  </div>
-                </form>
+                    <div className="w-full mb-4">
+                      <label
+                        className="mb-3 block text-sm font-medium text-black dark:text-white"
+                        htmlFor="password"
+                      >
+                        Confirm New Password
+                      </label>
+                      <div className="relative">
+                        <span className="absolute left-4.5 top-4">
+                          <svg
+                            className="fill-current"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <g opacity="0.8">
+                              <path
+                                fillRule="evenodd"
+                                clipRule="evenodd"
+                                d="M12 2C9.23858 2 7 4.23858 7 7V10H5C4.44772 10 4 10.4477 4 11V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V11C20 10.4477 19.5523 10 19 10H17V7C17 4.23858 14.7614 2 12 2ZM9 10V7C9 5.34315 10.3431 4 12 4C13.6569 4 15 5.34315 15 7V10H9ZM6 12H18V19H6V12ZM12 14C12.5523 14 13 14.4477 13 15V17C13 17.5523 12.5523 18 12 18C11.4477 18 11 17.5523 11 17V15C11 14.4477 11.4477 14 12 14Z"
+                                fill=""
+                              />
+                            </g>
+                          </svg>
+                        </span>
+                        <input
+                          className="w-full rounded border border-stroke bg-gray py-3 pl-11.5 pr-4.5 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white dark:focus:border-primary"
+                          type="password"
+                          name="password"
+                          id="password"
+                          value={passwordObject.confirmNewPassword}
+                          onChange={(e) =>
+                            setPasswordObject({
+                              ...passwordObject,
+                              confirmNewPassword: e.target.value,
+                            })
+                          }
+                          placeholder="Enter your new password"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end gap-4.5">
+                      <button
+                        className="flex justify-center rounded border border-stroke py-2 px-6 font-medium text-black hover:shadow-1 dark:border-strokedark dark:text-white"
+                        type="submit"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="flex justify-center rounded bg-primary py-2 px-6 font-medium text-gray hover:bg-opacity-70 disabled:bg-gray disabled:text-black"
+                        type="submit"
+                      >
+                        {updatePasswordLoading
+                          ? 'Loading...'
+                          : 'Update Password'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
-          </div>}
+          )}
         </div>
       </div>
     </>
