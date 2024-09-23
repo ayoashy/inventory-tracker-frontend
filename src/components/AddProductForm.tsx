@@ -35,7 +35,9 @@ const AddProductForm = () => {
   const { data: userData } = useGetUserApi();
   const { mutateAsync: addProduct, isLoading: addProductLoading } =
     useAddProductApi();
-  const { mutateAsync: editProduct } = useEditProductApi();
+  const { mutateAsync: editProduct, isLoading: isEditLoading } = useEditProductApi();
+
+  const loadingState = addProductLoading || isEditLoading
 
   useEffect(() => {
     const urlEditId = searchParams.get('edit');
@@ -128,9 +130,9 @@ const AddProductForm = () => {
 
             <button
               className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray disabled:bg-gray disabled:text-black"
-              disabled={addProductLoading}
+              disabled={loadingState}
             >
-              {addProductLoading
+              {loadingState
                 ? 'Loading...'
                 : editId
                 ? 'Update Product'
