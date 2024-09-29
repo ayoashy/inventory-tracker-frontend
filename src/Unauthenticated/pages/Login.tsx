@@ -201,7 +201,7 @@ await message.error(error.message || 'Unknown error');
                     disabled={isLoading}
                     onClick={handleLoginAsSales}
                   >
-                    {isLoading ? 'loading' : 'Login as User'}
+                    {isLoading ? 'loading' : 'Login as Sales'}
                   </button>
                 )}
 
