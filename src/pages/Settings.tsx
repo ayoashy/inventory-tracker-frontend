@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useAuth } from '../context/AuthContext';
 import { useUpdatePasswordApi } from '../data/hooks/auth';
 import { message } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 export type UpdatePasswordType = {
   currentPassword: string 
@@ -12,6 +13,7 @@ export type UpdatePasswordType = {
 const Settings = () => {
   const userData = useAuth();
   const { mutateAsync, isLoading: updatePasswordLoading } = useUpdatePasswordApi();
+  const navigate = useNavigate();
   
   const [passwordObject, setPasswordObject] = useState<UpdatePasswordType>({currentPassword:'',
     newPassword: '',
@@ -36,8 +38,9 @@ const Settings = () => {
       const response = await mutateAsync({currentPassword: passwordObject.currentPassword, newPassword: passwordObject.newPassword});
 
       if (response) {
-        await message.success('Password updated successful!Navigating...');
+        await message.success('Password updated successful!...');
       }
+      navigate('/');
     } catch (error: any) {
      await message.error(error.message || 'Problem updating password');
     }
