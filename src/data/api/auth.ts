@@ -23,16 +23,8 @@ export type UpdatePasswordType = {
 
 // Generic error handler
 export const handleApiError = (error: any): never => {
-  // if (error.code === 'ERR_BAD_REQUEST' || error.message === 'Network Error') {
   if ( error.message === 'Network Error') {
     throw new Error('Network Error');
-  }
-
-  if (
-    error.response.data.error ===
-    'MongoServerSelectionError: getaddrinfo ENOTFOUND ac-hjchve5-shard-00-00.dwx5qwf.mongodb.net'
-  ){
-    throw new Error("Bad Network")
   }
     if (error.response?.data?.error) {
       throw new Error(error.response.data.error);

@@ -7,7 +7,7 @@ const SelectApp: React.FC = () => {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>;   
   }
 
   return user ? <AdminApp /> : <UnauthenticatedApp />;
