@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { useAuth } from '../context/AuthContext';
 
@@ -10,7 +10,16 @@ const DropdownUser = () => {
 
   const trigger = useRef<any>(null);
   const dropdown = useRef<any>(null);
-  const navigate = useNavigate();
+
+  const handleLogout = async ()=>{
+    try {
+                localStorage.removeItem('invoice-auth-token');
+                window.location.reload();
+    } catch (error) {
+      localStorage.removeItem('invoice-auth-token');
+      window.location.reload()
+    }
+  }
 
   // close on click outside
   useEffect(() => {
@@ -138,10 +147,7 @@ const DropdownUser = () => {
             </Link>
           </li>
         </ul>
-        <button className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base" onClick={()=>{
-          localStorage.removeItem('invoice-auth-token');
-navigate('/');
-          }}>
+        <button className="flex items-center gap-3.5 py-4 px-6 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base" onClick={handleLogout}>
           <svg
             className="fill-current"
             width="22"
