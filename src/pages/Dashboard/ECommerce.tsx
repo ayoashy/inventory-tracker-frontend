@@ -29,7 +29,7 @@ const ECommerce = () => {
       {
         label: 'Sales',
         data: [totalSales],
-        backgroundColor: ['rgb(75, 192, 192)'],
+        backgroundColor: ['rgb(75, w192, 192)'],
       },
     ],
   };
